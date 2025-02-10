@@ -2,6 +2,7 @@
 title: "Oklahoma Death Row Tracker [DRAFT: NOT FOR PUBLICATION]"
 format:
   html:
+    css: styles.css
     grid:
       body-width: 1400px
 ---
@@ -95,7 +96,6 @@ leaflet(map_data,
   ) |>
    addControl(
     html = paste0(
-      "<div style='background-color: white; padding: 5px; width: 300px;'>",
       "<b>Oklahoma Death Row Cases</b><br>",
       "<em>since executions resumed in Oct. 2021</em><br><hr>",
       "<b>Total active cases:</b> ", statewide_total_active_cases, "<br>",
@@ -109,6 +109,7 @@ leaflet(map_data,
       "</em>",
       "</div>"
     ),
+    className = 'responsive-panel info legend',
     position = "bottomleft"
   ) |>
   htmlwidgets::prependContent(

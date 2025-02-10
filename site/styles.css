@@ -1,0 +1,12 @@
+.responsive-panel {
+  background-color: white;
+  padding: 5px;
+  width: 300px;
+}
+
+@media (max-width: 768px) {
+  .responsive-panel {
+    visibility: hidden !important;
+  }
+}
+
