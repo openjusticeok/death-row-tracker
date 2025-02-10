@@ -31,13 +31,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # - name: Set up system dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install libcurl4-openssl-dev libudunits2-dev libgdal-dev libharfbuzz-dev libfribidi-dev libmagick++-dev libsodium-dev
       - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/configure-pages@v4
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+      - name: Setup renv
+        uses: r-lib/actions/setup-renv@v2
+      - name: Render and Publish to GH Pages
+        uses: quarto-dev/quarto-actions/publish@v2
         with:
-          # Upload entire repository
-          path: 'site/'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          target: gh-pages
+          path: "site"

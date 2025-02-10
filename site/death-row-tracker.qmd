@@ -34,7 +34,7 @@ data <- googlesheets4::read_sheet(
 last_update <- data[1, last_update]
 ```
 
-This tool tracks all Oklahoma death row cases [since the resumption of executions in October of 2021](https://apnews.com/article/us-supreme-court-executions-oklahoma-05c84265d553c784eb862321aed2acb8). The data is manually compiled and updated by the Oklahoma Policy Institute. This information was last updated on `r format(last_update, "%b. %d, %Y")`
+This tool tracks all Oklahoma death row cases [since the resumption of executions in October of 2021](https://apnews.com/article/us-supreme-court-executions-oklahoma-05c84265d553c784eb862321aed2acb8). The data is manually compiled and updated by the Oklahoma Policy Institute. This information was last updated on `r format(last_update, "%b. %d, %Y")`.
 
 ## Cases by County
 
