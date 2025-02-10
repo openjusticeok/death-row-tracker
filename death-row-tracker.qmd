@@ -1,0 +1,164 @@
+---
+title: "Oklahoma Death Row Tracker [DRAFT: NOT FOR PUBLICATION]"
+format:
+  html:
+    grid:
+      body-width: 1400px
+---
+
+```{r setup, include=FALSE}
+library(googlesheets4)
+library(data.table)
+library(DT)
+library(janitor)
+library(leaflet)
+library(htmltools)
+library(sf)
+options(gargle_oauth_cache = ".secrets")
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  echo = FALSE
+)
+
+googlesheets4::gs4_auth(email = TRUE)
+
+data <- googlesheets4::read_sheet(
+  "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
+  sheet = "Death Row List",
+  trim_ws = TRUE
+) |>
+  janitor::clean_names() |>
+  data.table::as.data.table()
+
+last_update <- data[1, last_update]
+```
+
+This tool tracks all Oklahoma death row cases [since the resumption of executions in October of 2021](https://apnews.com/article/us-supreme-court-executions-oklahoma-05c84265d553c784eb862321aed2acb8). The data is manually compiled and updated by the Oklahoma Policy Institute. This information was last updated on `r format(last_update, "%b. %d, %Y")`
+
+## Cases by County
+
+```{r map}
+ok_counties <- readRDS("./shapefiles/ok_counties.rds") |>
+  setnames("NAME", "county_convicted") |>
+  sf::st_as_sf()
+
+map_data <- data[, 
+                 list(total_cases = .N,
+                      total_active_cases = sum(status == "Currently Incarcerated" | status == "Temporary Stay of Execution" | status == "Sentence Commuted"),
+                      total_executions = sum(!is.na(execution_date))), 
+                 by = county_convicted]
+
+map_data <- merge(ok_counties, map_data, 
+                  by = "county_convicted",
+                  all.x = TRUE) 
+map_data$total_cases <- as.numeric(map_data$total_cases)
+
+statewide_total_cases_since_2021 <- data[, .N]
+statewide_total_active_cases <- data[status == "Currently Incarcerated" | status == "Temporary Stay of Execution" | status == "Sentence Commuted", .N]
+statewide_total_commuted <- data[status == "Sentence Commuted", .N]
+statewide_total_stayed <- data[status == "Temporary Stay of Execution", .N]
+statewide_total_executions <- data[status == "Sentence Carried Out", .N]
+
+bounds <- list(
+  lng1 = -103.002565, lat1 = 33.615833, # Southwest corner
+  lng2 = -94.430662, lat2 = 37.002206   # Northeast corner
+)
+
+leaflet(map_data,
+        options = leafletOptions(zoomControl = FALSE,
+                                 minZoom = 7, maxZoom = 7,
+                                 dragging = FALSE,
+                                 attributionControl = FALSE)) |>
+  setView(lng = -97.5, lat = 35.5, zoom = 7) |>
+  setMaxBounds(lng1 = bounds$lng1, lat1 = bounds$lat1, 
+               lng2 = bounds$lng2, lat2 = bounds$lat2) |>
+  addPolygons(
+    weight = 1,  
+    color = "#ffffff",
+    fillColor = ~colorBin("YlOrRd", total_cases)(total_cases),
+    smoothFactor = 0,
+    fillOpacity = 0.8,
+    label = ~lapply(paste0("<b>", county_convicted, " County</b><br>",
+                           "Active Cases: ", total_active_cases, "<br>",
+                           "Executions Since 2021: ", total_executions, "<br><hr>",
+                           "Total: ", total_cases), 
+                    HTML),
+    highlightOptions = highlightOptions(
+      weight = 3,
+      color = "#000000",
+      fillOpacity = 1,
+      bringToFront = TRUE
+    )
+  ) |>
+   addControl(
+    html = paste0(
+      "<div style='background-color: white; padding: 5px; width: 300px;'>",
+      "<b>Oklahoma Death Row Cases</b><br>",
+      "<em>since executions resumed in Oct. 2021</em><br><hr>",
+      "<b>Total active cases:</b> ", statewide_total_active_cases, "<br>",
+      "<b>Total commutations since 2021:</b> ", statewide_total_commuted, "<br>",
+      "<b>Total executions since 2021:</b> ", statewide_total_executions,
+      "<br><br><em>",
+      "'Active cases' includes those currently on death row, those whose sentences have been commuted to life without parole and may be further contested",
+      " (", format(statewide_total_commuted), " total), ",
+      "and those who have received a temporary legal stay of execution",
+      " (", format(statewide_total_stayed), " total).",
+      "</em>",
+      "</div>"
+    ),
+    position = "bottomleft"
+  ) |>
+  htmlwidgets::prependContent(
+    htmltools::tags$style(".leaflet-container { background: transparent; }")
+  )
+```
+
+## All Cases
+
+```{r table}
+status_colors <- c(
+  "Sentence Carried Out" = "rgba(255, 0, 0, 0.25)",
+  "Died in Custody" = "rgba(255, 0, 0, 0.25)",
+  "Temporary Stay of Execution" = "rgba(255, 255, 0, 0.25)", 
+  "Sentence Commuted" = "rgba(0, 128, 0, 0.25)",
+  "Currently Incarcerated" = "rgba(128, 128, 128, 0.25)"
+)
+
+ppb_colors <- c(
+  "Clemency Denied" = "rgba(255, 0, 0, 0.25)",
+  "Clemency Recommended" = "rgba(0, 128, 0, 0.25)",
+  "No Date Set" = "rgba(128, 128, 128, 0.25)"
+)
+
+DT::datatable(
+  data[, .(name, county_convicted, gender, race_ethnicity, conviction_date,
+           years_on_death_row, ppb_decision, execution_date, status)],
+  colnames = c("Name", "County Convicted", "Gender", "Race", "Date Convicted",
+               "Years on Death Row", "PPB Decision", "Execution Date", "Status"),
+  extensions = c("Scroller", "Responsive"),
+  options = list(
+    scroller = TRUE,
+    autoWidth = TRUE,
+    scrollY = 800,
+    scrollX = TRUE,
+    dom = "t"
+  ),
+  selection = "none",
+  rownames = FALSE,
+  style = "bootstrap"
+) |>
+  DT::formatDate(
+    columns = c('conviction_date', 'execution_date'),
+    method = 'toLocaleDateString',
+    params = list('en-US', list(year = 'numeric', month = 'short', day = 'numeric'))
+  ) |>
+  DT::formatStyle(
+    'status',
+    backgroundColor = DT::styleEqual(names(status_colors), status_colors)
+  ) |>
+  DT::formatStyle(
+    'ppb_decision',
+    backgroundColor = DT::styleEqual(names(ppb_colors), ppb_colors)
+  )
+```

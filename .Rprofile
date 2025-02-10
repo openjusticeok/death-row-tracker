@@ -1,3 +1,4 @@
+source("renv/activate.R")
 ## Allows the use of a global .Rprofile while also using renv
 # Check if HOME environment variable is set
 home_dir <- Sys.getenv("HOME")
