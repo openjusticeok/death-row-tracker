@@ -109,7 +109,7 @@ leaflet(map_data,
       "</em>",
       "</div>"
     ),
-    className = 'responsive-panel info legend',
+    className = 'responsive-panel info legend', # makes this disappear on mobile, see styles.css
     position = "bottomleft"
   ) |>
   htmlwidgets::prependContent(
