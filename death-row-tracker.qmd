@@ -158,12 +158,12 @@ ppb_colors <- c(
 
 DT::datatable(
   data[, .(name, county_convicted,
-           ppb_decision, execution_date, status,
+           ppb_decision, status, execution_date,
            # gender, race_ethnicity, 
            conviction_date,
            years_on_death_row)],
   colnames = c("Name", "County Convicted",
-               "PPB Decision", "Execution Date", "Status",
+               "PPB Decision", "Status", "Execution Date", 
                # "Gender", "Race", 
                "Date Convicted",
                "Years Held"
