@@ -151,15 +151,23 @@ status_colors <- c(
 
 ppb_colors <- c(
   "Clemency Denied" = "rgba(255, 0, 0, 0.25)",
+  "Chose Not to File Petition" = "rgba(255, 0, 0, 0.25)",
   "Clemency Recommended" = "rgba(0, 128, 0, 0.25)",
   "No Date Set" = "rgba(128, 128, 128, 0.25)"
 )
 
 DT::datatable(
-  data[, .(name, county_convicted, gender, race_ethnicity, conviction_date,
-           years_on_death_row, ppb_decision, execution_date, status)],
-  colnames = c("Name", "County Convicted", "Gender", "Race", "Date Convicted",
-               "Years on Death Row", "PPB Decision", "Execution Date", "Status"),
+  data[, .(name, county_convicted,
+           ppb_decision, execution_date, status,
+           # gender, race_ethnicity, 
+           conviction_date,
+           years_on_death_row)],
+  colnames = c("Name", "County Convicted",
+               "PPB Decision", "Execution Date", "Status",
+               # "Gender", "Race", 
+               "Date Convicted",
+               "Years Held"
+               ),
   extensions = c("Scroller", "Responsive"),
   options = list(
     scroller = TRUE,
