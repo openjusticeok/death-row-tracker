@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
   echo = FALSE
 )
 
-googlesheets4::gs4_auth(email = TRUE)
+googlesheets4::gs4_deauth()
 
 data <- googlesheets4::read_sheet(
   "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
