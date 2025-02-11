@@ -53,4 +53,4 @@ jobs:
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: gh-pages
-          path: "site/death-row-tracker.qmd"
+          path: "death-row-tracker.qmd"
