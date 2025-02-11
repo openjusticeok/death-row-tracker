@@ -8,33 +8,52 @@ format:
 ---
 
 ```{r setup, include=FALSE}
-library(googlesheets4)
 library(data.table)
 library(DT)
 library(janitor)
 library(leaflet)
 library(htmltools)
 library(sf)
-options(gargle_oauth_cache = ".secrets")
+
 knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE,
   echo = FALSE
 )
 
-googlesheets4::gs4_auth(email = "abell@okpolicy.org",
-                        cache = ".secrets",
-                        scopes = "drive")
+# Get data if not running on GH actions
+if(rlang::is_interactive()){
+  library(googlesheets4)
+  
+  data <- googlesheets4::read_sheet(
+    "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
+    sheet = "Death Row List",
+    trim_ws = TRUE
+  ) |>
+    janitor::clean_names() |>
+    data.table::as.data.table()
+  
+  info <- googlesheets4::read_sheet(
+    "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
+    sheet = "Values",
+    trim_ws = TRUE
+  ) |>
+    janitor::clean_names() |>
+    data.table::as.data.table()
+  
+  saveRDS(data, "data/data.rds")
+  saveRDS(info, "data/info.rds")
+  
+} else {
+  
+  data <- readRDS("data/data.rds")
+  info <- readRDS("data/info.rds")
+  
+}
 
-data <- googlesheets4::read_sheet(
-  "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
-  sheet = "Death Row List",
-  trim_ws = TRUE
-) |>
-  janitor::clean_names() |>
-  data.table::as.data.table()
+last_update <- info[1, last_update]
 
-last_update <- data[1, last_update]
+
 ```
 
 This tool tracks all Oklahoma death row cases [since the resumption of executions in October of 2021](https://apnews.com/article/us-supreme-court-executions-oklahoma-05c84265d553c784eb862321aed2acb8). The data is manually compiled and updated by the Oklahoma Policy Institute. This information was last updated on `r format(last_update, "%b. %d, %Y")`.
