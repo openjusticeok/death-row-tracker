@@ -30,7 +30,7 @@ if(rlang::is_interactive()){
   data <- googlesheets4::read_sheet(
     "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
     sheet = "Death Row List",
-    trim_ws = TRUE
+    trim_ws = TRUE,
   ) |>
     janitor::clean_names() |>
     data.table::as.data.table()
@@ -163,12 +163,14 @@ DT::datatable(
            ppb_decision, status, execution_date,
            # gender, race_ethnicity, 
            conviction_date,
-           years_on_death_row)],
+           years_on_death_row,
+           formatted_events = paste0("<br>", formatted_events))],
   colnames = c("Name", "County Convicted",
                "PPB Decision", "Status", "Execution Date", 
                # "Gender", "Race", 
                "Date Convicted",
-               "Years Held"
+               "Years Held",
+               "Case Events"
                ),
   extensions = c("Scroller", "Responsive"),
   options = list(
@@ -180,6 +182,7 @@ DT::datatable(
   ),
   selection = "none",
   rownames = FALSE,
+  escape = FALSE,
   style = "bootstrap"
 ) |>
   DT::formatDate(
