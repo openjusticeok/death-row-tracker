@@ -85,18 +85,18 @@ statewide_total_stayed <- data[status == "Temporary Stay of Execution", .N]
 statewide_total_executions <- data[status == "Sentence Carried Out", .N]
 
 bounds <- list(
-  lng1 = -103.002565, lat1 = 33.615833, # Southwest corner
-  lng2 = -94.430662, lat2 = 37.002206   # Northeast corner
+  lng1 = -103.186665, lat1 = 33.505298, # Southwest corner
+  lng2 = -94.418665, lat2 = 37.189561   # Northeast corner
 )
 
 leaflet(map_data,
         options = leafletOptions(zoomControl = FALSE,
-                                 minZoom = 7, maxZoom = 7,
                                  dragging = FALSE,
+                                 zoomSnap = 0.25,
+                                 scrollWheelZoom = FALSE,
                                  attributionControl = FALSE)) |>
-  setView(lng = -97.5, lat = 35.5, zoom = 7) |>
-  setMaxBounds(lng1 = bounds$lng1, lat1 = bounds$lat1, 
-               lng2 = bounds$lng2, lat2 = bounds$lat2) |>
+  fitBounds(lng1 = bounds$lng1, lat1 = bounds$lat1, 
+            lng2 = bounds$lng2, lat2 = bounds$lat2) |>
   addPolygons(
     weight = 1,  
     color = "#ffffff",
