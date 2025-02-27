@@ -178,9 +178,10 @@ DT::datatable(
   ),
   options = list(
     # scroller = TRUE,
+    # scrollY = 800,
+    pageLength = -1, # Display all rows always
     autoWidth = TRUE,
-    scrollY = 800,
-    # scrollX = TRUE,
+    scrollX = TRUE,
     dom = "t",
     columnDefs = list(
       list(
