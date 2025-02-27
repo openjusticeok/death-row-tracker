@@ -224,3 +224,7 @@ DT::datatable(
     fontWeight = DT::styleEqual(future_execution_dates, "bold")
   )
 ```
+
+*Source: [Oklahoma Department of Corrections](https://okoffender.doc.ok.gov/)*
+
+*Note: Categories for race and gender are as reported by the Oklahoma Department of Corrections.*
