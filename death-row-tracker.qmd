@@ -142,13 +142,17 @@ leaflet(map_data,
 
 ## All Cases
 
+Cases are ordered by execution date and PPB hearing date. 
+
 ```{r table}
+# You can use this site to see these colors: https://rgb.to/rgb/
 status_colors <- c(
   "Sentence Carried Out" = "rgba(255, 0, 0, 0.25)",
   "Died in Custody" = "rgba(255, 0, 0, 0.25)",
   "Temporary Stay of Execution" = "rgba(255, 255, 0, 0.25)", 
   "Sentence Commuted" = "rgba(0, 128, 0, 0.25)",
-  "Currently Incarcerated" = "rgba(128, 128, 128, 0.25)"
+  "Currently Incarcerated" = "rgba(128, 128, 128, 0.25)",
+  "Execution Scheduled" = "rgba(255, 0, 0, 0.25)"
 )
 
 ppb_colors <- c(
@@ -158,18 +162,22 @@ ppb_colors <- c(
   "No Date Set" = "rgba(128, 128, 128, 0.25)"
 )
 
+future_execution_dates <- data[execution_date >= lubridate::today(), execution_date]
+
 DT::datatable(
   data[, .(name, county_convicted,
-           ppb_decision, status, execution_date,
-           # gender, race_ethnicity, 
            conviction_date,
-           years_on_death_row,
+           gender, race_ethnicity,
+           # years_on_death_row,
+           ppb_date,
+           ppb_decision, status, execution_date,
            formatted_events = paste0("<br>", formatted_events))],
   colnames = c("Name", "County Convicted",
-               "PPB Decision", "Status", "Execution Date", 
-               # "Gender", "Race", 
                "Date Convicted",
-               "Years Held",
+               "Gender", "Race",
+               "PPB Hearing",
+               # "Years Held",
+               "PPB Decision", "Status", "Execution Date", 
                "Case Events"
                ),
   extensions = c(
@@ -185,7 +193,7 @@ DT::datatable(
     dom = "t",
     columnDefs = list(
       list(
-        targets = 7, className = "none")  # Hide the case events column (0-indexed bc javascript)
+        targets = 9, className = "none")  # Hide the case events column (0-indexed bc javascript)
     )
   ),
   selection = "none",
@@ -194,16 +202,25 @@ DT::datatable(
   style = "bootstrap"
 ) |>
   DT::formatDate(
-    columns = c('conviction_date', 'execution_date'),
+    columns = c('conviction_date', 'ppb_date', 'execution_date'),
     method = 'toLocaleDateString',
-    params = list('en-US', list(year = 'numeric', month = 'short', day = 'numeric'))
+    params = list('en-US', list(year = 'numeric', 
+                                month = 'short', 
+                                day = 'numeric',
+                                timeZone = "UTC"))
   ) |>
   DT::formatStyle(
     'status',
-    backgroundColor = DT::styleEqual(names(status_colors), status_colors)
+    backgroundColor = DT::styleEqual(names(status_colors), status_colors),
+    fontWeight = DT::styleEqual(c("Execution Scheduled"), "bold")
   ) |>
   DT::formatStyle(
     'ppb_decision',
     backgroundColor = DT::styleEqual(names(ppb_colors), ppb_colors)
+  ) |>
+  DT::formatStyle(
+    'execution_date',
+    backgroundColor = DT::styleEqual(future_execution_dates, "rgba(255, 0, 0, 0.5)"),
+    fontWeight = DT::styleEqual(future_execution_dates, "bold")
   )
 ```
