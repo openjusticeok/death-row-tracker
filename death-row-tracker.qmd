@@ -35,26 +35,26 @@ if(rlang::is_interactive()){
     janitor::clean_names() |>
     data.table::as.data.table()
   
-  info <- googlesheets4::read_sheet(
-    "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
-    sheet = "Values",
-    trim_ws = TRUE
-  ) |>
-    janitor::clean_names() |>
-    data.table::as.data.table()
+  # info <- googlesheets4::read_sheet(
+  #   "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
+  #   sheet = "Values",
+  #   trim_ws = TRUE
+  # ) |>
+  #   janitor::clean_names() |>
+  #   data.table::as.data.table()
   
   saveRDS(data, "data/data.rds")
-  saveRDS(info, "data/info.rds")
+  # saveRDS(info, "data/info.rds")
   
 } else {
   
   data <- readRDS("data/data.rds")
-  info <- readRDS("data/info.rds")
+  # info <- readRDS("data/info.rds")
   
 }
 
-last_update <- info[1, last_update]
-
+# last_update <- info[1, last_update]
+last_update <- lubridate::today()
 
 ```
 
@@ -142,7 +142,7 @@ leaflet(map_data,
 
 ## All Cases
 
-Cases are ordered by execution date and PPB hearing date. 
+Cases are ordered by execution date and PPB hearing date.
 
 ```{r table}
 # You can use this site to see these colors: https://rgb.to/rgb/
