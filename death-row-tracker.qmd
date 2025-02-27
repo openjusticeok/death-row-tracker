@@ -149,7 +149,7 @@ leaflet(map_data,
 
 ## All Cases
 
-Cases are ordered by execution date and PPB hearing date.
+Cases are ordered by execution date and Pardon and Parole Board (PPB) hearing date.
 
 ```{r table}
 # You can use this site to see these colors: https://rgb.to/rgb/
