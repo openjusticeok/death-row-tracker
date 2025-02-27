@@ -75,8 +75,7 @@ map_data <- data[,
 
 map_data <- merge(ok_counties, map_data, 
                   by = "county_convicted",
-                  all.x = TRUE) 
-map_data$total_cases <- as.numeric(map_data$total_cases)
+                  all.x = TRUE)
 
 statewide_total_cases_since_2021 <- data[, .N]
 statewide_total_active_cases <- data[status == "Currently Incarcerated" | status == "Temporary Stay of Execution" | status == "Sentence Commuted", .N]
@@ -100,14 +99,22 @@ leaflet(map_data,
   addPolygons(
     weight = 1,  
     color = "#ffffff",
-    fillColor = ~colorBin("YlOrRd", total_cases)(total_cases),
+    fillColor = ~colorBin("YlOrRd", total_cases,
+                          na.color = "#DCDCDC")(total_cases),
     smoothFactor = 0,
     fillOpacity = 0.8,
     label = ~lapply(paste0("<div style='font-size: 14px;'>",
-                           "<b>", county_convicted, " County</b><br>",
-                           "Active Cases: ", total_active_cases, "<br>",
-                           "Executions Since 2021: ", total_executions, "<br><hr>",
-                           "Total: ", total_cases,
+                           "<b>", 
+                           county_convicted, 
+                           " County</b><br>",
+                           "Active Cases: ", 
+                           ifelse(!is.na(total_active_cases), total_active_cases, 0), 
+                           "<br>",
+                           "Executions Since 2021: ", 
+                           ifelse(!is.na(total_executions), total_executions, 0),
+                           "<br><hr>",
+                           "Total: ", 
+                           ifelse(!is.na(total_cases), total_cases, 0),
                            "</div>"), 
                     HTML),
     highlightOptions = highlightOptions(
