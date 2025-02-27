@@ -159,7 +159,8 @@ status_colors <- c(
   "Temporary Stay of Execution" = "rgba(255, 255, 0, 0.25)", 
   "Sentence Commuted" = "rgba(0, 128, 0, 0.25)",
   "Currently Incarcerated" = "rgba(128, 128, 128, 0.25)",
-  "Execution Scheduled" = "rgba(255, 0, 0, 0.25)"
+  "Execution Scheduled" = "rgba(255, 0, 0, 0.25)",
+  "Ruled Incompetent for Execution" = "rgba(255, 255, 0, 0.25)"
 )
 
 ppb_colors <- c(
