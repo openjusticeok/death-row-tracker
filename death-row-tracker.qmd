@@ -172,13 +172,20 @@ DT::datatable(
                "Years Held",
                "Case Events"
                ),
-  extensions = c("Scroller", "Responsive"),
+  extensions = c(
+    # "Scroller", 
+    "Responsive"
+  ),
   options = list(
-    scroller = TRUE,
+    # scroller = TRUE,
     autoWidth = TRUE,
     scrollY = 800,
-    scrollX = TRUE,
-    dom = "t"
+    # scrollX = TRUE,
+    dom = "t",
+    columnDefs = list(
+      list(
+        targets = 7, className = "none")  # Hide the case events column (0-indexed bc javascript)
+    )
   ),
   selection = "none",
   rownames = FALSE,
