@@ -128,9 +128,9 @@ leaflet(map_data,
     html = paste0(
       "<b>Oklahoma Death Row Cases</b><br>",
       "<em>since executions resumed in Oct. 2021</em><br><hr>",
-      "<b>Total active cases:</b> ", statewide_total_active_cases, "<br>",
-      "<b>Total commutations since 2021:</b> ", statewide_total_commuted, "<br>",
-      "<b>Total executions since 2021:</b> ", statewide_total_executions,
+      "<b>Active cases:</b> ", statewide_total_active_cases, "<br>",
+      "<b>Commutations since 2021:</b> ", statewide_total_commuted, "<br>",
+      "<b>Executions since 2021:</b> ", statewide_total_executions,
       "<br><br><em>",
       "'Active cases' includes those currently on death row, those whose sentences have been commuted to life without parole and may be further contested",
       " (", format(statewide_total_commuted), " total), ",
@@ -173,19 +173,27 @@ ppb_colors <- c(
 future_execution_dates <- data[execution_date >= lubridate::today(), execution_date]
 
 DT::datatable(
-  data[, .(name, county_convicted,
+  data[, .(name, 
+           county_convicted,
            conviction_date,
-           gender, race_ethnicity,
-           # years_on_death_row,
            ppb_date,
            ppb_decision, status, execution_date,
+           #
+           gender, race_ethnicity,
+           age_convicted,
+           # years_on_death_row,
+           current_age,
            formatted_events = paste0("<br>", formatted_events))],
-  colnames = c("Name", "County Convicted",
-               "Date Convicted",
-               "Gender", "Race",
+  colnames = c("Name", 
+               "County Convicted",
+               "Conviction Date",
                "PPB Hearing",
-               # "Years Held",
-               "PPB Decision", "Status", "Execution Date", 
+               "PPB Decision", "Status", "Execution Date",
+               #
+               "Gender:", "Race:",
+               "Age Convicted:",
+               # "Years on Death Row:",
+               "Current Age / Age Executed:",
                "Case Events"
                ),
   extensions = c(
@@ -198,10 +206,11 @@ DT::datatable(
     pageLength = -1, # Display all rows always
     autoWidth = TRUE,
     scrollX = TRUE,
-    dom = "t",
+    dom = "ft",
     columnDefs = list(
       list(
-        targets = 9, className = "none")  # Hide the case events column (0-indexed bc javascript)
+        targets = c(7, 8, 9, 10, 11, 12), 
+        className = "none")  # Hide the case events column (0-indexed bc javascript)
     )
   ),
   selection = "none",
