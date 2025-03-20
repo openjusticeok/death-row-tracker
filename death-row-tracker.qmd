@@ -1,5 +1,5 @@
 ---
-title: "Oklahoma Death Row Tracker [DRAFT: NOT FOR PUBLICATION]"
+title: "Oklahoma Death Row Tracker"
 format:
   html:
     css: styles.css
