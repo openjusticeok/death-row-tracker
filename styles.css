@@ -7,5 +7,7 @@
   .responsive-panel {
     visibility: hidden !important;
   }
+  .leaflet-container {
+    height: 150px !important;
+  }
 }
-
