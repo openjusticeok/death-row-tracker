@@ -53,9 +53,7 @@ if(rlang::is_interactive()){
   
 }
 
-# last_update <- info[1, last_update]
 last_update <- lubridate::today()
-
 ```
 
 This tool tracks all Oklahoma death row cases [since the resumption of executions in October of 2021](https://apnews.com/article/us-supreme-court-executions-oklahoma-05c84265d553c784eb862321aed2acb8). The data is manually compiled and updated by the Oklahoma Policy Institute. This information was last updated on `r format(last_update, "%b. %d, %Y")`.
