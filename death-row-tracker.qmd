@@ -1,5 +1,5 @@
 ---
-title: "Oklahoma Death Row Tracker"
+title: "Oklahoma Death Penalty Tracker"
 format:
   html:
     css: styles.css
@@ -56,7 +56,9 @@ if(rlang::is_interactive()){
 last_update <- lubridate::today()
 ```
 
-This tool tracks all Oklahoma death row cases [since the resumption of executions in October of 2021](https://apnews.com/article/us-supreme-court-executions-oklahoma-05c84265d553c784eb862321aed2acb8). The data is manually compiled and updated by the Oklahoma Policy Institute. This information was last updated on `r format(last_update, "%b. %d, %Y")`.
+This tool tracks all Oklahoma death penalty cases [since the resumption of executions in October of 2021](https://apnews.com/article/us-supreme-court-executions-oklahoma-05c84265d553c784eb862321aed2acb8). The data is manually compiled and updated by the Oklahoma Policy Institute. This information was last updated on `r format(last_update, "%b. %d, %Y")`.
+
+To read more about this tool and the recent history of the death penalty in Oklahoma, see [the Oklahoma Policy Institute's website](https://okpolicy.org/oklahoma-death-penalty-tracker-test/).
 
 ## Cases by County
 
