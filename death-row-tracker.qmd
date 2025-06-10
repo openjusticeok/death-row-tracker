@@ -69,7 +69,7 @@ ok_counties <- readRDS("./shapefiles/ok_counties.rds") |>
 
 map_data <- data[, 
                  list(total_cases = .N,
-                      total_active_cases = sum(status == "Currently Incarcerated" | status == "Temporary Stay of Execution" | status == "Sentence Commuted"),
+                      total_active_cases = sum(status == "Currently Incarcerated" | status == "Temporary Stay of Execution"),
                       total_executions = sum(!is.na(execution_date))), 
                  by = county_convicted]
 
@@ -78,8 +78,8 @@ map_data <- merge(ok_counties, map_data,
                   all.x = TRUE)
 
 statewide_total_cases_since_2021 <- data[, .N]
-statewide_total_active_cases <- data[status == "Currently Incarcerated" | status == "Temporary Stay of Execution" | status == "Sentence Commuted", .N]
-statewide_total_commuted <- data[status == "Sentence Commuted", .N]
+statewide_total_active_cases <- data[status == "Currently Incarcerated" | status == "Temporary Stay of Execution", .N]
+statewide_total_commuted <- data[status == "Sentence Commuted" | status == "Sentence Overturned", .N]
 statewide_total_stayed <- data[status == "Temporary Stay of Execution", .N]
 statewide_total_executions <- data[status == "Sentence Carried Out", .N]
 
@@ -157,7 +157,7 @@ leaflet(map_data,
 
 ## All Cases
 
-Cases are ordered by execution date and Pardon and Parole Board (PPB) hearing date.
+This table is sorted such that cases with significant recent developments (PPB hearings, executions, court rulings, etc.) will appear at the top.
 
 ```{r table}
 # You can use this site to see these colors: https://rgb.to/rgb/
@@ -166,6 +166,7 @@ status_colors <- c(
   "Died in Custody" = "rgba(255, 0, 0, 0.25)",
   "Temporary Stay of Execution" = "rgba(255, 255, 0, 0.25)", 
   "Sentence Commuted" = "rgba(0, 128, 0, 0.25)",
+  "Sentence Overturned" = "rgba(0, 128, 0, 0.25)",
   "Currently Incarcerated" = "rgba(128, 128, 128, 0.25)",
   "Execution Scheduled" = "rgba(255, 0, 0, 0.25)",
   "Ruled Incompetent for Execution" = "rgba(255, 255, 0, 0.25)"
@@ -181,7 +182,7 @@ ppb_colors <- c(
 
 future_execution_dates <- data[execution_date >= lubridate::today(), execution_date]
 
-setorder(data, -ppb_date, -execution_date, na.last = T) # Sort by ppb date, execution date
+setorder(data, -last_update, na.last = T) # Sort by ppb date, execution date
 
 table <- DT::datatable(
   data[, .(name, 
