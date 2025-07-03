@@ -28,7 +28,3 @@ Rscript -e "renv::restore()"
 # Render document
 quarto render death-row-tracker.qmd
 ```
-
-## License
-
-GPL-3.0
