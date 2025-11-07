@@ -195,7 +195,7 @@ table <- DT::datatable(
            age_convicted,
            # years_on_death_row,
            current_age,
-           formatted_events = paste0("<br>", formatted_events))],
+           formatted_events_new = paste0("<br>", formatted_events_new))],
   colnames = c("Name", 
                "County Convicted",
                "Conviction Date",
