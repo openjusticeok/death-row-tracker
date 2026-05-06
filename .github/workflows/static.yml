@@ -35,7 +35,7 @@ jobs:
       - name: Set up system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libcurl4-openssl-dev libpng-dev libudunits2-dev libgdal-dev libharfbuzz-dev libfribidi-dev libmagick++-dev libsodium-dev cmake gdal-bin libabsl-dev pandoc
+          sudo apt-get install libcurl4-openssl-dev libpng-dev libudunits2-dev libgdal-dev libharfbuzz-dev libfribidi-dev libmagick++-dev libsodium-dev cmake gdal-bin libabsl-dev pandoc libsqlite3-dev
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -45,6 +45,8 @@ jobs:
 
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
 
       - name: Setup Renv
         uses: r-lib/actions/setup-renv@v2
