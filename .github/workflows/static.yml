@@ -35,7 +35,7 @@ jobs:
       - name: Set up system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libcurl4-openssl-dev libpng-dev libudunits2-dev libgdal-dev libharfbuzz-dev libfribidi-dev libmagick++-dev libsodium-dev
+          sudo apt-get install libcurl4-openssl-dev libpng-dev libudunits2-dev libgdal-dev libharfbuzz-dev libfribidi-dev libmagick++-dev libsodium-dev cmake gdal-bin libabsl-dev pandoc
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
