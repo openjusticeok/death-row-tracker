@@ -35,21 +35,11 @@ if(rlang::is_interactive()){
     janitor::clean_names() |>
     data.table::as.data.table()
   
-  # info <- googlesheets4::read_sheet(
-  #   "https://docs.google.com/spreadsheets/d/1aR1xIXle4WAOUii204Q7_Z4e4frdUPHgIY9ER_MmxbQ/edit?gid=1129005821#gid=1129005821",
-  #   sheet = "Values",
-  #   trim_ws = TRUE
-  # ) |>
-  #   janitor::clean_names() |>
-  #   data.table::as.data.table()
-  
   saveRDS(data, "data/data.rds")
-  # saveRDS(info, "data/info.rds")
   
 } else {
   
   data <- readRDS("data/data.rds")
-  # info <- readRDS("data/info.rds")
   
 }
 
@@ -67,10 +57,13 @@ ok_counties <- readRDS("./shapefiles/ok_counties.rds") |>
   setnames("NAME", "county_convicted") |>
   sf::st_as_sf()
 
-map_data <- data[, 
+active_statuses <- c("Currently Incarcerated", "Temporary Stay of Execution",
+                     "Execution Scheduled", "Ruled Incompetent for Execution")
+
+map_data <- data[,
                  list(total_cases = .N,
-                      total_active_cases = sum(status == "Currently Incarcerated" | status == "Temporary Stay of Execution"),
-                      total_executions = sum(!is.na(execution_date))), 
+                      total_active_cases = sum(status %in% active_statuses),
+                      total_executions = sum(status == "Sentence Carried Out")),
                  by = county_convicted]
 
 map_data <- merge(ok_counties, map_data, 
@@ -78,9 +71,10 @@ map_data <- merge(ok_counties, map_data,
                   all.x = TRUE)
 
 statewide_total_cases_since_2021 <- data[, .N]
-statewide_total_active_cases <- data[status == "Currently Incarcerated" | status == "Temporary Stay of Execution", .N]
-statewide_total_commuted <- data[status == "Sentence Commuted" | status == "Sentence Overturned", .N]
-statewide_total_stayed <- data[status == "Temporary Stay of Execution", .N]
+statewide_total_active_cases <- data[status %in% active_statuses, .N]
+statewide_total_commuted <- data[status == "Sentence Commuted", .N]
+statewide_total_scheduled <- data[status == "Execution Scheduled", .N]
+statewide_total_incompetent <- data[status == "Ruled Incompetent for Execution", .N]
 statewide_total_executions <- data[status == "Sentence Carried Out", .N]
 
 bounds <- list(
@@ -135,10 +129,10 @@ leaflet(map_data,
       "<b>Commutations since 2021:</b> ", statewide_total_commuted, "<br>",
       "<b>Executions since 2021:</b> ", statewide_total_executions,
       "<br><br><em>",
-      "'Active cases' includes those currently on death row, those whose sentences have been commuted to life without parole and may be further contested",
-      " (", format(statewide_total_commuted), " total), ",
-      "and those who have received a temporary legal stay of execution",
-      " (", format(statewide_total_stayed), " total).",
+      "'Active cases' includes everyone currently on death row, including those with a scheduled execution date",
+      " (", format(statewide_total_scheduled), " total) ",
+      "and those ruled mentally incompetent for execution",
+      " (", format(statewide_total_incompetent), " total).",
       "</em>",
       "</div>"
     ),
@@ -182,7 +176,7 @@ ppb_colors <- c(
 
 future_execution_dates <- data[execution_date >= lubridate::today(), execution_date]
 
-setorder(data, -last_update, na.last = T) # Sort by ppb date, execution date
+setorder(data, -last_update, na.last = T) # Sort by most recent update
 
 table <- DT::datatable(
   data[, .(name, 
@@ -190,22 +184,22 @@ table <- DT::datatable(
            conviction_date,
            ppb_date,
            ppb_decision, status, execution_date,
-           #
            gender, race_ethnicity,
            age_convicted,
            # years_on_death_row,
-           current_age,
+           current_age = paste0("<span class='dtr-title'>",
+                                ifelse(status %in% c("Sentence Carried Out", "Died in Custody"),
+                                       "Age at Death:", "Current Age:"),
+                                "</span> ", current_age),
            formatted_events_new = paste0("<br>", formatted_events_new))],
   colnames = c("Name", 
                "County Convicted",
                "Conviction Date",
                "PPB Hearing",
                "PPB Decision", "Status", "Execution Date",
-               #
                "Gender:", "Race:",
                "Age Convicted:",
-               # "Years on Death Row:",
-               "Current Age / Age Executed:",
+               "", # Age label depends on if they're alive or not, it's built into the cell above
                "Case Events"
   ),
   extensions = c(
@@ -248,7 +242,7 @@ table <- DT::datatable(
     backgroundColor = DT::styleEqual(names(ppb_colors), ppb_colors)
   )
 
-if (length(future_execution_dates > 0)) {
+if (length(future_execution_dates) > 0) {
   table <- table |>
     DT::formatStyle(
       'execution_date',

@@ -1,3 +1,8 @@
+/* Hide blank column titles in expanded table rows (e.g. the age column) */
+table.dataTable > tbody > tr.child span.dtr-title:empty {
+  display: none;
+}
+
 .responsive-panel {
   padding: 5px;
   width: 300px;
